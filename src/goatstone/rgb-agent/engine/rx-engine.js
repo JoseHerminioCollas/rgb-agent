@@ -1,11 +1,11 @@
 const Rx = require('rx')
 
-function rXEngine(start$, stop$, reset$, scriptArray){
+function rXEngine(start$, stop$, reset$, scriptArray, intervalStart){
     
     return Rx.Observable.merge(
         start$.flatMapLatest(() =>
                              Rx.Observable
-                             .interval(2000)
+                             .interval(intervalStart)
                              .takeUntil(stop$)
                             ).map((x) => {
                                 console.log(scriptArray[ (x % scriptArray.length) ])
@@ -13,6 +13,5 @@ function rXEngine(start$, stop$, reset$, scriptArray){
                             }),
         reset$.map(() => 0)
     )
-        .take(49)
 }
 module.exports = rXEngine

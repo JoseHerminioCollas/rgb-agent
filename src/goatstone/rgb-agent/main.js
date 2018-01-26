@@ -8,22 +8,17 @@ var bodyParser = require('body-parser')
 let EventEmitter = require('events').EventEmitter
 const Rx = require('rx')
 
-var mqtt = require('mqtt')
-var client  = mqtt.connect('mqtt://192.168.0.10')
-
 const mqttClient = require('goatstone/rgb-agent/mqtt-client/client')
 const rXEngine = require('goatstone/rgb-agent/engine/rx-engine')
+const chaseEngine = require('goatstone/rgb-agent/engine/chase-engine')
 const moveEngine = require('goatstone/rgb-agent/engine/move-engine')
-
+const chaseEffect = require('goatstone/rgb-agent/effect/chase')
+const patterns = require('goatstone/rgb-agent/patterns/patterns')
 // routes
 const rgb = require('goatstone/rgb-agent/routes/rgb')
 const index = require('goatstone/rgb-agent/routes/index')
 
-const scriptArray = [
-  {red: 10, green: 100, blue: 200},
-  {red: 200, green: 100, blue: 10},
-  {red: 10, green: 200, blue: 100},
-  ]
+const scriptArray = patterns.glow
 
 var startEvent = new EventEmitter()
 let start$ = Rx.Observable.fromEvent(startEvent, 'data')
@@ -31,10 +26,9 @@ let stopEvent = new EventEmitter()
 const stop$ = Rx.Observable.fromEvent(stopEvent, 'data')
 let resetEvent = new EventEmitter()
 const reset$ = Rx.Observable.fromEvent(resetEvent, 'data')
-
- mqttClient.red('100')    
-
 const colorEvent = new EventEmitter()
+const effectEvent = new EventEmitter()
+
 colorEvent.on('red', level => {
  mqttClient.red(level)    
 })
@@ -44,20 +38,18 @@ colorEvent.on('green', level => {
 colorEvent.on('blue', level => {
  mqttClient.blue(level)    
 })
-//mqttClient.chaseOn()
 
-const rXESub = rXEngine(start$, stop$, reset$, scriptArray)
+effectEvent.on('chase', x => chaseEffect(chaseEngine, mqttClient))
+// effectEvent.emit('chase', 1)
+
+// use Rx to drive the frame push
+const rXESub = rXEngine(start$, stop$, reset$, scriptArray, 1000)
 rXESub.subscribe(data => {
-
-  // drive the MQTT calls 
-  client.publish('feather-one:light:red', (data.red).toString())
-  client.publish('feather-one:light:green', (data.green).toString())
-  client.publish('feather-one:light:blue', (data.blue).toString())
-
-  console.log('data!!!: ', data.red)
+  // send frames through the MQTT client
+  mqttClient.frame(data)
 })
-
-moveEngine(startEvent, stopEvent, resetEvent)
+startEvent.emit('data', 1)
+// moveEngine(startEvent, stopEvent, resetEvent)
 
 // app
 var app = express()
@@ -72,7 +64,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', index)
-app.use('/rgb', rgb(startEvent, stopEvent, resetEvent, colorEvent))
+app.use('/rgb', rgb(startEvent, stopEvent, resetEvent, colorEvent, effectEvent))
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found')

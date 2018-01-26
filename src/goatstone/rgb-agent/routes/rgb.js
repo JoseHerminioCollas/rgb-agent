@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-function rgb (startEvent, stopEvent, resetEvent, colorEvent) {
+function rgb (startEvent, stopEvent, resetEvent, colorEvent, effectEvent) {
   return router.post('/light/:property/:level', function(req, res, next) {
     // console.log('rgb: ', req.params)
     // console.log('rgb: ', req.query)
@@ -16,12 +16,7 @@ function rgb (startEvent, stopEvent, resetEvent, colorEvent) {
       colorEvent.emit('blue', level)
     }
     else if (property === 'effect') {
-    }
-    // the effect called 'chace' an effect is a property of the light
-    // 0  for off, 1 for on
-    else if (property === 'chase' && level === '0') {
-    }
-    else if (property === 'chase' && level === '1') {
+      effectEvent.emit('chase', 1000)
     }
     else if (property === 'rx' && level === '1') {
       startEvent.emit('data', '1')
