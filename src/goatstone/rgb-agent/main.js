@@ -20,14 +20,8 @@ const index = require('goatstone/rgb-agent/routes/index')
 
 const scriptArray = patterns.glow
 
-var startEvent = new EventEmitter()
-let start$ = Rx.Observable.fromEvent(startEvent, 'data')
-let stopEvent = new EventEmitter()
-const stop$ = Rx.Observable.fromEvent(stopEvent, 'data')
-let resetEvent = new EventEmitter()
-const reset$ = Rx.Observable.fromEvent(resetEvent, 'data')
+// color event
 const colorEvent = new EventEmitter()
-const effectEvent = new EventEmitter()
 
 colorEvent.on('red', level => {
  mqttClient.red(level)    
@@ -39,17 +33,27 @@ colorEvent.on('blue', level => {
  mqttClient.blue(level)    
 })
 
-effectEvent.on('chase', x => chaseEffect(chaseEngine, mqttClient))
-// effectEvent.emit('chase', 1)
+// chase event
+const chaseEvent = new EventEmitter()
+chaseEvent.on('chase', x => chaseEffect(chaseEngine, mqttClient))
+chaseEvent.emit('chase', 1)
 
 // use Rx to drive the frame push
+var startEvent = new EventEmitter()
+const startEffectEvent = new EventEmitter()
+let start$ = Rx.Observable.fromEvent(startEffectEvent, 'data')
+let stopEvent = new EventEmitter()
+const stop$ = Rx.Observable.fromEvent(stopEvent, 'data')
+let resetEvent = new EventEmitter()
+const reset$ = Rx.Observable.fromEvent(resetEvent, 'data')
+
 const rXESub = rXEngine(start$, stop$, reset$, scriptArray, 1000)
 rXESub.subscribe(data => {
   // send frames through the MQTT client
   mqttClient.frame(data)
 })
-startEvent.emit('data', 1)
-// moveEngine(startEvent, stopEvent, resetEvent)
+// startEffectEvent.emit('data', 1)
+// moveEngine(startEffectEvent, stopEvent, resetEvent)
 
 // app
 var app = express()
@@ -64,7 +68,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', index)
-app.use('/rgb', rgb(startEvent, stopEvent, resetEvent, colorEvent, effectEvent))
+app.use('/rgb', rgb(startEffectEvent, stopEvent, resetEvent, colorEvent, chaseEvent))
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found')

@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-function rgb (startEvent, stopEvent, resetEvent, colorEvent, effectEvent) {
+function rgb (startEffectEvent, stopEvent, resetEvent, colorEvent, chaseEvent) {
   return router.post('/light/:property/:level', function(req, res, next) {
     // console.log('rgb: ', req.params)
     // console.log('rgb: ', req.query)
@@ -15,11 +15,14 @@ function rgb (startEvent, stopEvent, resetEvent, colorEvent, effectEvent) {
     else if (property === 'blue') {
       colorEvent.emit('blue', level)
     }
-    else if (property === 'effect') {
-      effectEvent.emit('chase', 1000)
+    else if (property === 'chase') {
+      chaseEvent.emit('chase', 1000)
     }
-    else if (property === 'rx' && level === '1') {
-      startEvent.emit('data', '1')
+    else if (property === 'effect' && level === '1') {
+      startEffectEvent.emit('data', '1')
+    }
+    else if (property === 'effect' && level === '0') {
+      stopEvent.emit('data', '0')
     }
     const msg = `::: ${new Date()}`
     console.log(msg )

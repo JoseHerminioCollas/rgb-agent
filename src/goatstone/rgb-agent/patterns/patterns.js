@@ -17,5 +17,9 @@ module.exports = {
         {red: 150, green: 150, blue: 150},
         {red: 170, green: 170, blue: 170},
         {red: 200, green: 200, blue: 200},
+        {red: 170, green: 170, blue: 170},
+        {red: 150, green: 150, blue: 150},
+        {red: 75, green: 75, blue: 75},
+        {red: 50, green: 50, blue: 50},
     ]
 }
