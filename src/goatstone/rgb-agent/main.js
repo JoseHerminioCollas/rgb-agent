@@ -18,27 +18,13 @@ const patterns = require('goatstone/rgb-agent/patterns/patterns')
 const rgb = require('goatstone/rgb-agent/routes/rgb')
 const index = require('goatstone/rgb-agent/routes/index')
 
+// A pattern that will be used in the engine for data
 const scriptArray = patterns.glow
 
 // color event
 const colorEvent = new EventEmitter()
 
-colorEvent.on('red', level => {
- mqttClient.red(level)    
-})
-colorEvent.on('green', level => {
- mqttClient.green(level)    
-})
-colorEvent.on('blue', level => {
- mqttClient.blue(level)    
-})
-
-// chase event
-const chaseEvent = new EventEmitter()
-chaseEvent.on('chase', x => chaseEffect(chaseEngine, mqttClient))
-chaseEvent.emit('chase', 1)
-
-// use Rx to drive the frame push
+// Effect engine wit same interval use Rx to drive the frame push
 var startEvent = new EventEmitter()
 const startEffectEvent = new EventEmitter()
 let start$ = Rx.Observable.fromEvent(startEffectEvent, 'data')
@@ -50,12 +36,23 @@ const reset$ = Rx.Observable.fromEvent(resetEvent, 'data')
 const rXESub = rXEngine(start$, stop$, reset$, scriptArray, 1000)
 rXESub.subscribe(data => {
   // send frames through the MQTT client
-  mqttClient.frame(data)
+  // frameEvent.emit('frame', data)
+//  mqttClient.frame(data)
 })
-// startEffectEvent.emit('data', 1)
+
+// Start the effect engine
+//startEffectEvent.emit('data', 1)
+
+// Call start and stop on the effect engine with a script
 // moveEngine(startEffectEvent, stopEvent, resetEvent)
 
-// app
+// The module that will actually call the MQTT Brocker 
+mqttClient(colorEvent)
+
+// start the chase effect, the interval of calls will vary
+chaseEffect(chaseEngine, colorEvent)
+
+// set up the Express application
 var app = express()
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -68,7 +65,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', index)
-app.use('/rgb', rgb(startEffectEvent, stopEvent, resetEvent, colorEvent, chaseEvent))
+app.use('/rgb', rgb(startEffectEvent, stopEvent, resetEvent, colorEvent))
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found')
