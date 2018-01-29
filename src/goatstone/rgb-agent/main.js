@@ -23,6 +23,7 @@ const scriptArray = patterns.glow
 
 // color event
 const colorEvent = new EventEmitter()
+const frameEvent = new EventEmitter()
 
 // Effect engine wit same interval use Rx to drive the frame push
 var startEvent = new EventEmitter()
@@ -36,21 +37,8 @@ const reset$ = Rx.Observable.fromEvent(resetEvent, 'data')
 const rXESub = rXEngine(start$, stop$, reset$, scriptArray, 1000)
 rXESub.subscribe(data => {
   // send frames through the MQTT client
-  // frameEvent.emit('frame', data)
-//  mqttClient.frame(data)
+  frameEvent.emit('frame', data)
 })
-
-// Start the effect engine
-//startEffectEvent.emit('data', 1)
-
-// Call start and stop on the effect engine with a script
-// moveEngine(startEffectEvent, stopEvent, resetEvent)
-
-// The module that will actually call the MQTT Brocker 
-mqttClient(colorEvent)
-
-// start the chase effect, the interval of calls will vary
-chaseEffect(chaseEngine, colorEvent)
 
 // set up the Express application
 var app = express()
@@ -81,5 +69,17 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500)
   res.render('error')
 })
+
+// The module that will actually call the MQTT Brocker 
+mqttClient(colorEvent, frameEvent)
+
+// Start an effect
+startEffectEvent.emit('data', 1)
+
+// Call start and stop on the effect engine with a script
+// moveEngine(startEffectEvent, stopEvent, resetEvent)
+
+// start the chase effect, the interval of calls will vary
+// chaseEffect(chaseEngine, colorEvent)
 
 module.exports = app

@@ -8,7 +8,7 @@ function rXEngine(start$, stop$, reset$, scriptArray, intervalStart){
                              .interval(intervalStart)
                              .takeUntil(stop$)
                             ).map((x) => {
-                                console.log(scriptArray[ (x % scriptArray.length) ])
+                                // console.log(scriptArray[ (x % scriptArray.length) ])
                                 return scriptArray[ (x % scriptArray.length) ]
                             }),
         reset$.map(() => 0)

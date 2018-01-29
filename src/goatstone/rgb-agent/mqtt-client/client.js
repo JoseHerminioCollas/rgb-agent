@@ -1,7 +1,7 @@
 var mqtt = require('mqtt')
 var client  = mqtt.connect('mqtt://192.168.0.10')
 
-function mqttClient(colorEvent) {
+function mqttClient(colorEvent, frameEvent) {
 
   client.on('connect', function () {
     client.subscribe('ping')
@@ -22,7 +22,10 @@ function mqttClient(colorEvent) {
     console.log('mqtt client b', level)
   //  mqttClient.blue(level)    
   })
-
+  frameEvent.on('frame', frame => {
+    console.log('frame ---', frame)
+    
+  })
   function red (level) {
     client.publish('feather-one:light:red', level)
   }
