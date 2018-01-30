@@ -23,7 +23,6 @@ function rgb (startEffectEvent, stopEvent, resetEvent, colorEvent, chaseEvent) {
       stopEvent.emit('data', '0')
     }
     const msg = `::: ${new Date()}`
-    console.log(msg )
     res.send(msg)
     });
 }

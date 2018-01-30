@@ -19,7 +19,7 @@ const rgb = require('goatstone/rgb-agent/routes/rgb')
 const index = require('goatstone/rgb-agent/routes/index')
 
 // A pattern that will be used in the engine for data
-const scriptArray = patterns.glow
+const scriptArray = patterns.emVehicle
 
 // color event
 const colorEvent = new EventEmitter()
