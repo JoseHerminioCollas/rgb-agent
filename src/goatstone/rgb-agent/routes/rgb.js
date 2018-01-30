@@ -2,8 +2,6 @@ var express = require('express');
 var router = express.Router();
 function rgb (startEffectEvent, stopEvent, resetEvent, colorEvent, chaseEvent) {
   return router.post('/light/:property/:level', function(req, res, next) {
-    // console.log('rgb: ', req.params)
-    // console.log('rgb: ', req.query)
     const property = req.params.property
     const level = req.params.level
     if (property === 'red') {

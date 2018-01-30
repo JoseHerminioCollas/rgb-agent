@@ -11,21 +11,19 @@ function mqttClient(colorEvent, frameEvent) {
   })
 
   colorEvent.on('red', level => {
-    console.log('mqtt client', level)
-  //  mqttClient.red(level)    
+    red(level)
   })
   colorEvent.on('green', level => {
-    console.log('mqtt client g ', level)
-  //  mqttClient.green(level)    
+    green(level)
   })
   colorEvent.on('blue', level => {
-    console.log('mqtt client b', level)
-  //  mqttClient.blue(level)    
+    blue(level)
   })
-  frameEvent.on('frame', frame => {
-    console.log('frame ---', frame)
-    
+
+  frameEvent.on('frame', frameData => {
+    frame(frameData)    
   })
+
   function red (level) {
     client.publish('feather-one:light:red', level)
   }
@@ -42,5 +40,4 @@ function mqttClient(colorEvent, frameEvent) {
   }
 }
 
-//const mqttClient = {red, green, blue, frame}
 module.exports = mqttClient

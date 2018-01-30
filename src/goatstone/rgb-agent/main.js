@@ -40,6 +40,9 @@ rXESub.subscribe(data => {
   frameEvent.emit('frame', data)
 })
 
+// The module that will actually call the MQTT Brocker 
+mqttClient(colorEvent, frameEvent)
+
 // set up the Express application
 var app = express()
 // view engine setup
@@ -69,9 +72,6 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500)
   res.render('error')
 })
-
-// The module that will actually call the MQTT Brocker 
-mqttClient(colorEvent, frameEvent)
 
 // Start an effect
 startEffectEvent.emit('data', 1)
