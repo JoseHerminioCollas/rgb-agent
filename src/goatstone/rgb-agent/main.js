@@ -13,7 +13,6 @@ var broker  = mqtt.connect('mqtt://192.168.0.10')
 const mqttClient = require('goatstone/rgb-agent/mqtt-client/client')
 const rXEngine = require('goatstone/rgb-agent/engine/rx-engine')
 const chaseEngine = require('goatstone/rgb-agent/engine/chase-engine')
-const moveEngine = require('goatstone/rgb-agent/engine/move-engine')
 const chaseEffect = require('goatstone/rgb-agent/effect/chase')
 const patterns = require('goatstone/rgb-agent/patterns/patterns')
 // routes
@@ -27,7 +26,7 @@ const scriptArray = patterns.emVehicle
 const colorEvent = new EventEmitter()
 const frameEvent = new EventEmitter()
 
-// Effect engine wit same interval use Rx to drive the frame push
+// Effect engine, drive the frame push
 var startEvent = new EventEmitter()
 const startEffectEvent = new EventEmitter()
 let start$ = Rx.Observable.fromEvent(startEffectEvent, 'data')
@@ -78,9 +77,6 @@ app.use(function(err, req, res, next) {
 
 // Start an effect
 startEffectEvent.emit('data', 1)
-
-// Call start and stop on the effect engine with a script
-// moveEngine(startEffectEvent, stopEvent, resetEvent)
 
 // start the chase effect, the interval of calls will vary
 // chaseEffect(chaseEngine, colorEvent)
