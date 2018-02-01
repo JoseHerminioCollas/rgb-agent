@@ -8,6 +8,8 @@ var bodyParser = require('body-parser')
 let EventEmitter = require('events').EventEmitter
 const Rx = require('rx')
 
+var mqtt = require('mqtt')
+var broker  = mqtt.connect('mqtt://192.168.0.10')
 const mqttClient = require('goatstone/rgb-agent/mqtt-client/client')
 const rXEngine = require('goatstone/rgb-agent/engine/rx-engine')
 const chaseEngine = require('goatstone/rgb-agent/engine/chase-engine')
@@ -37,11 +39,12 @@ const reset$ = Rx.Observable.fromEvent(resetEvent, 'data')
 const rXESub = rXEngine(start$, stop$, reset$, scriptArray, 1000)
 rXESub.subscribe(data => {
   // send frames through the MQTT client
+  console.log('xx', data)
   frameEvent.emit('frame', data)
 })
 
 // The module that will actually call the MQTT Brocker 
-mqttClient(colorEvent, frameEvent)
+mqttClient(broker, colorEvent, frameEvent)
 
 // set up the Express application
 var app = express()

@@ -13,9 +13,6 @@ function rgb (startEffectEvent, stopEvent, resetEvent, colorEvent, chaseEvent) {
     else if (property === 'blue') {
       colorEvent.emit('blue', level)
     }
-    else if (property === 'chase') {
-      chaseEvent.emit('chase', 1000)
-    }
     else if (property === 'effect' && level === '1') {
       startEffectEvent.emit('data', '1')
     }

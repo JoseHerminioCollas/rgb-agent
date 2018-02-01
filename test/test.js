@@ -92,5 +92,39 @@ describe('RGB API', function() {
             done()
           })
     })
+    it(`should post and call the 
+      startEffectEvent event emitter with a level value of 1`, done => {      
+      const expectedLevel = 1
+      const property = 'effect'
+      const URL = `/rgb/light/${property}/${expectedLevel}`
+      const spy = td.function()
+      startEffectEvent.on('data', spy)
+      request(app)
+         .post(URL)
+          .expect(200)
+          .end(x => {
+            const explain = td.explain(spy)
+            expect(explain.callCount).to.equal(1)
+            expect(parseInt(explain.calls[0].args[0])).to.equal(expectedLevel)
+            done()
+          })
+    })
+    it(`should post and call the 
+      stopEvent event emitter with a level value of 1`, done => {      
+      const expectedLevel = 0
+      const property = 'effect'
+      const URL = `/rgb/light/${property}/${expectedLevel}`
+      const spy = td.function()
+      stopEvent.on('data', spy)
+      request(app)
+         .post(URL)
+          .expect(200)
+          .end(x => {
+            const explain = td.explain(spy)
+            expect(explain.callCount).to.equal(1)
+            expect(parseInt(explain.calls[0].args[0])).to.equal(expectedLevel)
+            done()
+          })
+    })
   })
 })
