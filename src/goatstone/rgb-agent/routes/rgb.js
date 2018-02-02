@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
-function rgb (startEffectEvent, stopEvent, resetEvent, colorEvent, chaseEvent) {
+function rgb (
+  startEffectEvent, stopEvent, resetEvent, colorEvent, effectEvent) {
   return router.post('/light/:property/:level', function(req, res, next) {
     const property = req.params.property
     const level = req.params.level
@@ -18,6 +19,9 @@ function rgb (startEffectEvent, stopEvent, resetEvent, colorEvent, chaseEvent) {
     }
     else if (property === 'effect' && level === '0') {
       stopEvent.emit('data', '0')
+    }
+    else if (property === 'set') {
+      effectEvent.emit('set', level)
     }
     const msg = `::: ${new Date()}`
     res.send(msg)

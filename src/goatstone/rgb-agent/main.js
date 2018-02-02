@@ -8,25 +8,31 @@ var bodyParser = require('body-parser')
 let EventEmitter = require('events').EventEmitter
 const Rx = require('rx')
 
-var mqtt = require('mqtt')
-var broker  = mqtt.connect('mqtt://192.168.0.10')
+// goatstone modules
 const mqttClient = require('goatstone/rgb-agent/mqtt-client/client')
 const rXEngine = require('goatstone/rgb-agent/engine/rx-engine')
 const chaseEngine = require('goatstone/rgb-agent/engine/chase-engine')
 const chaseEffect = require('goatstone/rgb-agent/effect/chase')
 const patterns = require('goatstone/rgb-agent/patterns/patterns')
+
 // routes
 const rgb = require('goatstone/rgb-agent/routes/rgb')
 const index = require('goatstone/rgb-agent/routes/index')
 
-// A pattern that will be used in the engine for data
-const scriptArray = patterns.emVehicle
+// set up the broker
+var broker  = (require('mqtt')).connect('mqtt://192.168.0.10')
+
+// A pattern that will be used in the engine to get data
+let scriptArray = patterns.emVehicle
 
 // color event
 const colorEvent = new EventEmitter()
 const frameEvent = new EventEmitter()
 
-// Effect engine, drive the frame push
+// The module that will actually call the MQTT Brocker
+mqttClient(broker, colorEvent, frameEvent)
+
+// events for the effect engine
 var startEvent = new EventEmitter()
 const startEffectEvent = new EventEmitter()
 let start$ = Rx.Observable.fromEvent(startEffectEvent, 'data')
@@ -35,15 +41,21 @@ const stop$ = Rx.Observable.fromEvent(stopEvent, 'data')
 let resetEvent = new EventEmitter()
 const reset$ = Rx.Observable.fromEvent(resetEvent, 'data')
 
-const rXESub = rXEngine(start$, stop$, reset$, scriptArray, 1000)
-rXESub.subscribe(data => {
-  // send frames through the MQTT client
-  console.log('xx', data)
-  frameEvent.emit('frame', data)
+// constrol the data used with effectEvent
+const effectEvent = new EventEmitter()
+effectEvent.on('set', name => {
+  if(!patterns[name]) return false
+  scriptArray = patterns[name]
 })
 
-// The module that will actually call the MQTT Brocker 
-mqttClient(broker, colorEvent, frameEvent)
+// timer stream drive the frame push
+let timerEngineSubscription = rXEngine(start$, stop$, reset$,  1000)
+timerEngineSubscription.subscribe(i => {
+  let data = scriptArray[ (i % scriptArray.length) ]
+  console.log(' - ', data, i)
+  // send frames through the MQTT client
+  frameEvent.emit('frame', data)
+})
 
 // set up the Express application
 var app = express()
@@ -58,7 +70,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', index)
-app.use('/rgb', rgb(startEffectEvent, stopEvent, resetEvent, colorEvent))
+app.use('/rgb', rgb(startEffectEvent, stopEvent, resetEvent, colorEvent, effectEvent))
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found')
