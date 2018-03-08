@@ -8,6 +8,9 @@ function mqttClient(broker, colorEvent, frameEvent) {
     console.log(message.toString())
   })
 
+  colorEvent.on('color', values => {
+    frame(values)
+  })
   colorEvent.on('red', level => {
     red(level)
   })
