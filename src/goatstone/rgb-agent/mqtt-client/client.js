@@ -1,5 +1,5 @@
 
-function mqttClient(broker, colorEvent, frameEvent) {
+function mqttClient(broker, colorEvent, frameEvent, effecEvent) {
 
   broker.on('connect', function () {
     broker.subscribe('ping')
@@ -25,6 +25,8 @@ function mqttClient(broker, colorEvent, frameEvent) {
     frame(frameData)    
   })
 
+  effecEvent.on('off', effectOff)
+
   function red (level) {
     broker.publish('feather-one:light:red', level)
   }
@@ -38,6 +40,9 @@ function mqttClient(broker, colorEvent, frameEvent) {
     broker.publish('feather-one:light:red', (data.red).toString())
     broker.publish('feather-one:light:green', (data.green).toString())
     broker.publish('feather-one:light:blue', (data.blue).toString())
+  }
+  function effectOff() {
+    broker.publish('feather-one:light:blue', 'off')    
   }
 }
 

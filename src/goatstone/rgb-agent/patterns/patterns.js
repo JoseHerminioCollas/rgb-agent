@@ -1,10 +1,10 @@
 module.exports = {
-    march: [
+    chase: [
         {red: 0, green: 0, blue: 255},
         {red: 255, green: 0, blue: 0},
         {red: 0, green: 255, blue: 0},
     ],
-    emVehicle: [
+    'red-blue': [
         {red: 0, green: 0, blue: 255},
         {red: 255, green: 0, blue: 0},
         {red: 0, green: 0, blue: 255},
@@ -21,5 +21,6 @@ module.exports = {
         {red: 150, green: 150, blue: 150},
         {red: 75, green: 75, blue: 75},
         {red: 50, green: 50, blue: 50},
-    ]
+    ],
+    off: null,
 }

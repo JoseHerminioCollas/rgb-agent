@@ -29,11 +29,7 @@ let scriptArray = patterns.emVehicle
 const colorEvent = new EventEmitter()
 const frameEvent = new EventEmitter()
 
-// The module that will actually call the MQTT Brocker
-mqttClient(broker, colorEvent, frameEvent)
-
 // events for the effect engine
-var startEvent = new EventEmitter()
 const startEffectEvent = new EventEmitter()
 let start$ = Rx.Observable.fromEvent(startEffectEvent, 'data')
 let stopEvent = new EventEmitter()
@@ -43,16 +39,14 @@ const reset$ = Rx.Observable.fromEvent(resetEvent, 'data')
 
 // constrol the data used with effectEvent
 const effectEvent = new EventEmitter()
-effectEvent.on('set', name => {
-  if(!patterns[name]) return false
-  scriptArray = patterns[name]
-})
+
+// The module that will actually call the MQTT Brocker
+mqttClient(broker, colorEvent, frameEvent, effectEvent)
 
 // timer stream drive the frame push
 let timerEngineSubscription = rXEngine(start$, stop$, reset$,  1000)
 timerEngineSubscription.subscribe(i => {
   let data = scriptArray[ (i % scriptArray.length) ]
-  console.log(' - ', data, i)
   // send frames through the MQTT client
   frameEvent.emit('frame', data)
 })
@@ -66,6 +60,26 @@ function rgbLightColor(colorEvent) {
     res.send(msg)
   })  
 }
+function rgbLightEffect(effectEvent) {
+  return router.post('/:name', function(req, res, next) {
+    const name = req.params.name
+    const msg = `: ${new Date()} : ${name}  `
+    effectEvent.emit('set', name)
+    res.send(msg)
+  })  
+}
+
+effectEvent.on('set', name => {
+  if(!patterns[name]) return false
+  // is it turned on? turn it on
+  if(name === 'off'){
+    stopEvent.emit('data', 0)
+    return
+  }
+  scriptArray = patterns[name]
+  startEffectEvent.emit('data', 1)
+})
+
 // set up the Express application
 var app = express()
 // view engine setup
@@ -85,7 +99,8 @@ app.use(function(req, res, next) {
 })
 app.use('/', index)
 app.use('/rgb/light/color', rgbLightColor(colorEvent))
-app.use('/rgb', rgb(startEffectEvent, stopEvent, resetEvent, colorEvent, effectEvent))
+app.use('/rgb/light/effect', rgbLightEffect(effectEvent))
+// app.use('/rgb', rgb(startEffectEvent, stopEvent, resetEvent, colorEvent, effectEvent))
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found')
@@ -102,10 +117,9 @@ app.use(function(err, req, res, next) {
   res.render('error')
 })
 
-// Start an effect
 // startEffectEvent.emit('data', 1)
 
 // start the chase effect, the interval of calls will vary
-// chaseEffect(chaseEngine, colorEvent)
+//chaseEffect(chaseEngine, colorEvent)
 
 module.exports = app
