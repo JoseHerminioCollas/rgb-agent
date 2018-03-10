@@ -8,7 +8,6 @@ var bodyParser = require('body-parser')
 let EventEmitter = require('events').EventEmitter
 const Rx = require('rx')
 
-// goatstone modules
 const mqttClient = require('goatstone/rgb-agent/mqtt-client/client')
 const rXEngine = require('goatstone/rgb-agent/engine/rx-engine')
 const chaseEngine = require('goatstone/rgb-agent/engine/chase-engine')
@@ -17,6 +16,8 @@ const patterns = require('goatstone/rgb-agent/patterns/patterns')
 
 // routes
 const rgb = require('goatstone/rgb-agent/routes/rgb')
+const rgbLightColor = require('goatstone/rgb-agent/routes/rgb-light-color')
+const rgbLightEffect = require('goatstone/rgb-agent/routes/rgb-light-effect')
 const index = require('goatstone/rgb-agent/routes/index')
 
 // set up the broker
@@ -25,9 +26,9 @@ var broker  = (require('mqtt')).connect('mqtt://192.168.0.10')
 // A pattern that will be used in the engine to get data
 let scriptArray = patterns.emVehicle
 
-// color event
 const colorEvent = new EventEmitter()
 const frameEvent = new EventEmitter()
+const effectEvent = new EventEmitter()
 
 // events for the effect engine
 const startEffectEvent = new EventEmitter()
@@ -37,8 +38,6 @@ const stop$ = Rx.Observable.fromEvent(stopEvent, 'data')
 let resetEvent = new EventEmitter()
 const reset$ = Rx.Observable.fromEvent(resetEvent, 'data')
 
-// constrol the data used with effectEvent
-const effectEvent = new EventEmitter()
 
 // The module that will actually call the MQTT Brocker
 mqttClient(broker, colorEvent, frameEvent, effectEvent)
@@ -50,24 +49,6 @@ timerEngineSubscription.subscribe(i => {
   // send frames through the MQTT client
   frameEvent.emit('frame', data)
 })
-function rgbLightColor(colorEvent) {
-  return router.post('/:red/:green/:blue', function(req, res, next) {
-    const red = parseInt(req.params.red)
-    const green = parseInt(req.params.green)
-    const blue = parseInt(req.params.blue)
-    const msg = `: ${new Date()} : ${red} ${green} ${blue} `
-    colorEvent.emit('color', {red, green, blue})
-    res.send(msg)
-  })  
-}
-function rgbLightEffect(effectEvent) {
-  return router.post('/:name', function(req, res, next) {
-    const name = req.params.name
-    const msg = `: ${new Date()} : ${name}  `
-    effectEvent.emit('set', name)
-    res.send(msg)
-  })  
-}
 
 effectEvent.on('set', name => {
   if(!patterns[name]) return false
@@ -117,7 +98,6 @@ app.use(function(err, req, res, next) {
   res.render('error')
 })
 
-// startEffectEvent.emit('data', 1)
 
 // start the chase effect, the interval of calls will vary
 //chaseEffect(chaseEngine, colorEvent)
