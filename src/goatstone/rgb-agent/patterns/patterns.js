@@ -22,5 +22,5 @@ module.exports = {
         {red: 75, green: 75, blue: 75},
         {red: 50, green: 50, blue: 50},
     ],
-    off: null,
+    off: [],
 }
