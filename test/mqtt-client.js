@@ -7,10 +7,12 @@ describe('MQTT Client Wrapper', () => {
 
     const colorEvent = new EventEmitter()
     const frameEvent = new EventEmitter()
+    const effectEvent = new EventEmitter()
     let brokerTD
+
     beforeEach(() => {
         brokerTD = td.object()
-        mqttClient(brokerTD, colorEvent, frameEvent)
+        mqttClient(brokerTD, colorEvent, frameEvent, effectEvent)
     })
     it(`should call the MQTT client when colorEvent 'red' is called`, () => {
         colorEvent.emit('red', 1)
