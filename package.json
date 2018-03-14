@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "nodemon  ./bin/www",
-    "test": "mocha test/*"
+    "test": "mocha test/*",
+    "test-c": "nyc mocha test/*"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
@@ -22,6 +23,7 @@
     "serve-favicon": "~2.4.5"
   },
   "devDependencies": {
+    "nyc": "^11.6.0",
     "supertest": "^3.0.0",
     "testdouble": "^3.3.3"
   }
