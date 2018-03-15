@@ -9,8 +9,12 @@ var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var td = require('testdouble')
 
+const rgbLightColor = require('goatstone/rgb-agent/routes/rgb-light-color')
+const rgbLightEffect = require('goatstone/rgb-agent/routes/rgb-light-effect')
+const index = require('goatstone/rgb-agent/routes/index')
+
 const app = express()
-app.get('/user', function(req, res) {
+app.get('/user', function (req, res) {
   res.status(200).json({ name: 'tobi' })
 })
 app.set('views', path.join(__dirname, '../src/goatstone/rgb-agent/views'))
@@ -21,110 +25,50 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, '../public')))
 
-var startEvent = new EventEmitter()
+const startEvent = new EventEmitter()
 const startEffectEvent = new EventEmitter()
-let stopEvent = new EventEmitter()
-let resetEvent = new EventEmitter()
+const stopEvent = new EventEmitter()
+const resetEvent = new EventEmitter()
 const colorEvent = new EventEmitter()
+const effectEvent = new EventEmitter()
 
-const index = require('goatstone/rgb-agent/routes/index')
 app.use('/', index)
+app.use('/rgb/light/color', rgbLightColor(colorEvent))
+app.use('/rgb/light/effect', rgbLightEffect(effectEvent))
 
-const rgb = require('goatstone/rgb-agent/routes/rgb')
-app.use('/rgb', rgb(startEffectEvent, stopEvent, resetEvent, colorEvent))
-
-describe('RGB API', function() {
-  describe('end point for the rgb device', function() {
+describe('RGB API', function () {
+  describe('end point for the rgb device', function () {
     it('should display a simple message when called', done => {
       request(app)
-          .get('/')
-          .expect(200)
-          .end(x => done())
+        .get('/')
+        .expect(200)
+        .end(x => done())
     })
-    it(`should post and call the 
-      colorEvent event emitter with a level value of 100`, done => {      
-      const expectedLevel = 100
-      const property = 'red'
-      const URL = `/rgb/light/${property}/${expectedLevel}`
-      const spy = td.function()
-      colorEvent.on('red', spy)
-      request(app)
-         .post(URL)
+    it(`should post and call the colorEvent event emitter`, done => {
+        const URL = `/rgb/light/color/1/2/2/`
+        const spy = td.function()
+        colorEvent.on('color', spy)
+        request(app)
+          .post(URL)
           .expect(200)
           .end(x => {
             const explain = td.explain(spy)
             expect(explain.callCount).to.equal(1)
-            expect(parseInt(explain.calls[0].args[0])).to.equal(expectedLevel)
             done()
           })
-    })
-    it(`should post and call the 
-      colorEvent event emitter with a level value of 200`, done => {      
-      const expectedLevel = 100
-      const property = 'green'
-      const URL = `/rgb/light/${property}/${expectedLevel}`
-      const spy = td.function()
-      colorEvent.on('green', spy)
-      request(app)
-         .post(URL)
+      })
+    it(`should post and call the effectEvent event emitter`, done => {
+        const URL = `/rgb/light/effect/glow/`
+        const spy = td.function()
+        effectEvent.on('set', spy)
+        request(app)
+          .post(URL)
           .expect(200)
           .end(x => {
             const explain = td.explain(spy)
             expect(explain.callCount).to.equal(1)
-            expect(parseInt(explain.calls[0].args[0])).to.equal(expectedLevel)
             done()
           })
-    })
-    it(`should post and call the 
-      colorEvent event emitter with a level value of 10`, done => {      
-      const expectedLevel = 100
-      const property = 'blue'
-      const URL = `/rgb/light/${property}/${expectedLevel}`
-      const spy = td.function()
-      colorEvent.on('blue', spy)
-      request(app)
-         .post(URL)
-          .expect(200)
-          .end(x => {
-            const explain = td.explain(spy)
-            expect(explain.callCount).to.equal(1)
-            expect(parseInt(explain.calls[0].args[0])).to.equal(expectedLevel)
-            done()
-          })
-    })
-    it(`should post and call the 
-      startEffectEvent event emitter with a level value of 1`, done => {      
-      const expectedLevel = 1
-      const property = 'effect'
-      const URL = `/rgb/light/${property}/${expectedLevel}`
-      const spy = td.function()
-      startEffectEvent.on('data', spy)
-      request(app)
-         .post(URL)
-          .expect(200)
-          .end(x => {
-            const explain = td.explain(spy)
-            expect(explain.callCount).to.equal(1)
-            expect(parseInt(explain.calls[0].args[0])).to.equal(expectedLevel)
-            done()
-          })
-    })
-    it(`should post and call the 
-      stopEvent event emitter with a level value of 1`, done => {      
-      const expectedLevel = 0
-      const property = 'effect'
-      const URL = `/rgb/light/${property}/${expectedLevel}`
-      const spy = td.function()
-      stopEvent.on('data', spy)
-      request(app)
-         .post(URL)
-          .expect(200)
-          .end(x => {
-            const explain = td.explain(spy)
-            expect(explain.callCount).to.equal(1)
-            expect(parseInt(explain.calls[0].args[0])).to.equal(expectedLevel)
-            done()
-          })
-    })
+      })
   })
 })
