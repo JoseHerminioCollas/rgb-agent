@@ -20,7 +20,8 @@
     "mqtt": "^2.15.1",
     "nodemon": "^1.14.11",
     "rx": "^4.1.0",
-    "serve-favicon": "~2.4.5"
+    "serve-favicon": "~2.4.5",
+    "winston": "^2.4.1"
   },
   "devDependencies": {
     "nyc": "^11.6.0",

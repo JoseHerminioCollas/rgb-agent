@@ -1,5 +1,6 @@
 let EventEmitter = require('events').EventEmitter
 const Rx = require('rx')
+const winston = require('winston')
 
 const mqttClient = require('goatstone/rgb-agent/mqtt-client/client')
 const patterns = require('goatstone/rgb-agent/patterns/patterns')
@@ -24,7 +25,7 @@ const startEffectEvent = new EventEmitter()
 const stopEvent = new EventEmitter()
 const resetEvent = new EventEmitter()
 
-mqttClient(broker, colorEvent, frameEvent, effectEvent)
+mqttClient(broker, colorEvent, frameEvent, effectEvent, winston)
 effectEngine(patterns, startEffectEvent, stopEvent, resetEvent, effectEvent, frameEvent)
 
 module.exports = server(index, rgbLightColor(colorEvent), rgbLightEffect(effectEvent))

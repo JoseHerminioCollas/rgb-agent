@@ -1,11 +1,13 @@
 
-function mqttClient(broker, colorEvent, frameEvent, effecEvent) {
+function mqttClient(broker, colorEvent, frameEvent, effecEvent, logger) {
 
   broker.on('connect', function () {
     broker.subscribe('ping')
   })
-  broker.on('ping', function (topic, message) {
-    console.log(message.toString())
+  broker.on('ping', function (topic, message = 'default ping message') {
+    logger.log('mqtt', 'ping', {
+      message
+    })
   })
 
   colorEvent.on('color', values => {
