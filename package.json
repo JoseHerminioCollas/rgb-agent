@@ -5,8 +5,7 @@
   "scripts": {
     "start": "nodemon  ./bin/www",
     "test": "mocha test/*",
-    "test-c": "nyc mocha test/*",
-    "postinstall": "./install.sh"
+    "test-c": "nyc mocha test/*"
   },
   "dependencies": {
     "app-module-path": "^2.2.0",
