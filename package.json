@@ -5,9 +5,11 @@
   "scripts": {
     "start": "nodemon  ./bin/www",
     "test": "mocha test/*",
-    "test-c": "nyc mocha test/*"
+    "test-c": "nyc mocha test/*",
+    "postinstall": "./install.sh"
   },
   "dependencies": {
+    "app-module-path": "^2.2.0",
     "body-parser": "~1.18.2",
     "chai": "^4.1.2",
     "cookie-parser": "~1.4.3",

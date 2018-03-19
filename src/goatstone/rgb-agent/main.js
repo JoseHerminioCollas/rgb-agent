@@ -2,17 +2,17 @@ let EventEmitter = require('events').EventEmitter
 const Rx = require('rx')
 const winston = require('winston')
 
-const mqttClient = require('goatstone/rgb-agent/mqtt-client/client')
-const patterns = require('goatstone/rgb-agent/patterns/patterns')
-const effectEngine = require('goatstone/rgb-agent/engine/effect')
+const mqttClient = require('./mqtt-client/client')
+const patterns = require('./patterns/patterns')
+const effectEngine = require('./engine/effect')
 
 // express server
-const server = require('goatstone/rgb-agent/server.js')
+const server = require('./server.js')
 
 // routes
-const rgbLightColor = require('goatstone/rgb-agent/routes/rgb-light-color')
-const rgbLightEffect = require('goatstone/rgb-agent/routes/rgb-light-effect')
-const index = require('goatstone/rgb-agent/routes/index')
+const rgbLightColor = require('./routes/rgb-light-color')
+const rgbLightEffect = require('./routes/rgb-light-effect')
+const index = require('./routes/index')
 
 // MQTT broker
 var broker = (require('mqtt')).connect('mqtt://192.168.0.10')

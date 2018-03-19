@@ -3,8 +3,11 @@
 /**
  * Module dependencies.
  */
+// ***IMPORTANT**: The following line should be added to the very
+//                 beginning of your main script!
+require('app-module-path').addPath(__dirname + '/src/goatstone');
 
-var app = require('goatstone/rgb-agent/main');
+var app = require('../src/goatstone/rgb-agent/main');
 var debug = require('debug')('rgb-agent:server');
 var http = require('http');
 

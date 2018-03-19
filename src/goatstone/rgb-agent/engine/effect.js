@@ -1,6 +1,6 @@
 // effectEngine( start$, stop$, reset$, frameEvent, effectEvent)
 const Rx = require('rx')
-const rXEngine = require('goatstone/rgb-agent/engine/rx-engine')
+const rXEngine = require('./rx-engine')
 
 function effectEngine(patterns, startEffectEvent, stopEvent, resetEvent, effectEvent, frameEvent) {
     // TODO replace with calling event
