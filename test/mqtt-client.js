@@ -1,7 +1,7 @@
 const expect = require('chai').expect
 let EventEmitter = require('events').EventEmitter
 var td = require('testdouble')
-const mqttClient = require('goatstone/rgb-agent/mqtt-client/client')
+const mqttClient = require('../src/goatstone/rgb-agent/mqtt-client/client')
 
 // mock the MQTT Client
 const mQTTClientEE = new EventEmitter()

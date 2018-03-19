@@ -9,9 +9,9 @@ var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var td = require('testdouble')
 
-const rgbLightColor = require('goatstone/rgb-agent/routes/rgb-light-color')
-const rgbLightEffect = require('goatstone/rgb-agent/routes/rgb-light-effect')
-const index = require('goatstone/rgb-agent/routes/index')
+const rgbLightColor = require('../src/goatstone/rgb-agent/routes/rgb-light-color')
+const rgbLightEffect = require('../src/goatstone/rgb-agent/routes/rgb-light-effect')
+const index = require('../src/goatstone/rgb-agent/routes/index')
 
 const app = express()
 app.get('/user', function (req, res) {

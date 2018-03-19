@@ -5,10 +5,10 @@ const expect = chai.expect
 const EventEmitter = require('events').EventEmitter
 const td = require('testdouble')
 
-const patterns = require('goatstone/rgb-agent/patterns/patterns')
-const rXEngine = require('goatstone/rgb-agent/engine/rx-engine')
+const patterns = require('../src/goatstone/rgb-agent/patterns/patterns')
+const rXEngine = require('../src/goatstone/rgb-agent/engine/rx-engine')
 
-const scriptArray = patterns.emVehicle
+const scriptArray = patterns.glow
 
 const startEvent = new EventEmitter()
 const startEffectEvent = new EventEmitter()
@@ -23,25 +23,25 @@ const reset$ = Rx.Observable.fromEvent(resetEvent, 'data')
 let rXESub
 
 describe('RX Engine', () => {
-
     beforeEach(() => {
         rXESub = rXEngine(start$, stop$, reset$, scriptArray, 1000)
     })
 
-    it('should start and emit an object from array provided when started', () => {
+    it('should start and emit an integer 0 when started', done => {
+        let count = 0
         rXESub.subscribe(data => {
             stopEvent.emit('data', 1)
-            expect(data).to.deep.equal(scriptArray[0])
-            done()
+            // use a count so done does will only be called once
+            if (count === 0) {
+                expect(data).to.equal(0)
+                done()
+            }
+            count++
         })
         startEffectEvent.emit('data', 1)
     })
 
     it('should reset to zero', done => {
-        let count
-        before(() => {
-            count = 0
-        })
         rXESub.subscribe(data => {
             // TODO confirm that this output increments, it is NOT 0
         })
